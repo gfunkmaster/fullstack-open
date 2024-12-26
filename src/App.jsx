@@ -1,41 +1,49 @@
 import { useState } from "react";
-const Display = ({ counter }) => {
-  return (
-    <div>{counter}</div>
-  )
-}
+import { Unicafe } from "./part1/unicafe/Unicafe";
+import Button from "./utils /Button";
+import Display from "./utils /Display";
+import { Anecdotes } from "./part1/anecdotes/Anecdotes";
 
-const Button = ({ onClick, text }) => (
-  <button onClick={onClick}>
-    {text}
-  </button>
-)
-const App = () => {
-  const [ counter, setCounter ] = useState(0)
-
-  const increaseByOne = () => setCounter(counter + 1)
-
-  const decreaseByOne = () => setCounter(counter - 1)
-  const setToZero = () => setCounter(0)
+const History = (props) => {
+  if (props.allClicks.length === 0) {
+    return (
+      <div>
+        the app is used by pressing the buttons
+      </div>
+    )
+  }
 
   return (
     <div>
-      <Display counter={counter}/>
-
-      <Button
-        onClick={increaseByOne}
-        text='plus'
-      />
-      <Button
-        onClick={setToZero}
-        text='zero'
-      />     
-      <Button
-        onClick={decreaseByOne}
-        text='minus'
-      />           
+      button press history: {props.allClicks.join(' ')}
     </div>
   )
 }
 
+
+
+const App = () => {
+  const [value, setValue] = useState(10)
+
+  const setToValue = newValue => {
+    console.log('value now', newValue)
+    setValue(newValue)
+  }
+
+  return (
+    <div>
+      {/* <Display value={value} />
+      <Button handleClick={() => setToValue(value + 1000)} text="thousand" />
+      <Button handleClick={() => setToValue(0)} text="reset" />
+      <Button handleClick={() => setToValue(value + 1)} text="increment" /> */}
+        <div>
+          <Unicafe />
+        </div>
+        <div>
+          <Anecdotes />
+        </div>
+    </div>
+    
+  )
+}
 export default App;
