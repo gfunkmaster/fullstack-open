@@ -15,7 +15,7 @@ const Notes = (props) => {
     };
 
     setNotes(notes.concat(noteObject));
-    setNewNote("");
+    setNewNote("")
   };
 
   const handleNoteChange = (event) => {
