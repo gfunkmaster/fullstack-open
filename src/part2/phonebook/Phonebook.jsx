@@ -14,7 +14,7 @@ export const Phonebook = () => {
       const [filter, setFilter] = useState("");
       const [newPerson, setNewPerson] = useState([]);
 
-      const getNotes = () => {
+      const getPersons = () => {
         console.log('effect')
         axios
           .get('http://localhost:3001/persons')
@@ -25,7 +25,7 @@ export const Phonebook = () => {
           })
       }
       
-      useEffect(getNotes, [])
+      useEffect(getPersons, [])
     
       const addNewEntry = (event) => {
         event.preventDefault();
