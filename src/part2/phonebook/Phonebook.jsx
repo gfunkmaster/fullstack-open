@@ -1,34 +1,20 @@
 import React, { useState, useEffect } from "react";
-import _ from "lodash";
-import axios from "axios";
 import pbService from "../../services/phonebook";
 import Person from "./Person";
+import Notification from "../../componenets/Notification";
 
 export const Phonebook = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState([]);
+  const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
-  const [newPerson, setNewPerson] = useState([]);
-
-  // const getPersons = () => {
-  //   console.log('effect')
-  //   axios
-  //     .get('http://localhost:3001/persons')
-  //     .then(response => {
-  //       console.log('promise fulfilled')
-  //       console.log(response.data)
-  //       setNewPerson(response.data)
-  //     })
-  // }
-
-  // useEffect(getPersons, [])
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    pbService.getAllPersons().then((intialPersons) => {
-      setPersons(intialPersons);
+    pbService.getAllPersons().then((initialPersons) => {
+      setPersons(initialPersons);
     });
-  });
+  }, []);
 
   const addNewEntry = (event) => {
     event.preventDefault();
@@ -38,7 +24,6 @@ export const Phonebook = () => {
       number: newNumber.trim(),
     };
 
-    // Check if the person already exists in the phonebook by name
     const existingPerson = persons.find(
       (person) => person.name.toLowerCase() === newEntry.name.toLowerCase()
     );
@@ -49,41 +34,61 @@ export const Phonebook = () => {
       );
 
       if (confirmUpdate) {
-        // Update the person's number
         const updatedEntry = { ...existingPerson, number: newEntry.number };
         pbService
           .updatePerson(existingPerson.id, updatedEntry)
           .then((updatedPerson) => {
-            // Update the state with the updated person
             setPersons(
               persons.map((person) =>
                 person.id === existingPerson.id ? updatedPerson : person
               )
             );
-            setNewName(""); // Clear input fields
+            setNotification({
+              message: `Updated ${updatedPerson.name}'s number successfully!`,
+              type: "success",
+            });
+            setTimeout(() => setNotification(null), 3000); // Clear notification
+            setNewName("");
             setNewNumber("");
           })
           .catch((error) => {
-            console.error("Error updating person:", error);
-            alert(
-              `The person "${existingPerson.name}" could not be updated. They may have been removed from the server.`
-            );
-            setPersons(persons.filter((p) => p.id !== existingPerson.id)); // Remove stale data from state
+            if (error.response && error.response.status === 404) {
+              setNotification({
+                message: `The person "${existingPerson.name}" was already removed from the server.`,
+                type: "error",
+              });
+              setTimeout(() => setNotification(null), 3000);
+              setPersons(persons.filter((p) => p.id !== existingPerson.id)); // Remove stale data
+            } else {
+              setNotification({
+                message: `Failed to update ${existingPerson.name}.`,
+                type: "error",
+              });
+              setTimeout(() => setNotification(null), 3000);
+            }
           });
       }
       return;
     }
 
-    // Add new entry if no duplicate is found
     pbService
       .createPerson(newEntry)
       .then((returnPerson) => {
         setPersons(persons.concat(returnPerson));
-        setNewName(""); // Clear input fields
+        setNotification({
+          message: `Added ${returnPerson.name} successfully!`,
+          type: "success",
+        });
+        setTimeout(() => setNotification(null), 3000);
+        setNewName("");
         setNewNumber("");
       })
       .catch((error) => {
-        console.error("Error adding person:", error);
+        setNotification({
+          message: `Failed to add ${newEntry.name}.`,
+          type: "error",
+        });
+        setTimeout(() => setNotification(null), 3000);
       });
   };
 
@@ -100,10 +105,8 @@ export const Phonebook = () => {
   );
 
   const deletePerson = (id) => {
-    // Find the person to delete
     const personToDelete = persons.find((p) => p.id === id);
 
-    // Confirm deletion with the user
     if (!personToDelete) {
       alert("Person not found.");
       return;
@@ -114,19 +117,22 @@ export const Phonebook = () => {
     );
 
     if (confirmDelete) {
-      // Call the service to delete the person
       pbService
         .deletePerson(id)
         .then(() => {
-          // Remove the person from the state
           setPersons(persons.filter((person) => person.id !== id));
+          setNotification({
+            message: `Deleted ${personToDelete.name} successfully!`,
+            type: "success",
+          });
+          setTimeout(() => setNotification(null), 3000);
         })
         .catch((error) => {
-          console.error("Error deleting person:", error);
-          alert(
-            `The person "${personToDelete.name}" was already deleted from the server.`
-          );
-          // Remove the stale person from the state
+          setNotification({
+            message: `Failed to delete ${personToDelete.name}. They may have already been removed from the server.`,
+            type: "error",
+          });
+          setTimeout(() => setNotification(null), 3000);
           setPersons(persons.filter((person) => person.id !== id));
         });
     }
@@ -135,6 +141,9 @@ export const Phonebook = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      {notification && (
+        <Notification message={notification.message} type={notification.type} />
+      )}
       <div>
         find persons:{" "}
         <input

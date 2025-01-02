@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Content = ({name, exercises}) => {
-   console.log(name)
+   
   return (
     <div>
            <p>

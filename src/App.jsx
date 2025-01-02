@@ -3,6 +3,7 @@ import Note from "./componenets/Note";
 import Courses from "./part1/courseinfo/Courses";
 import Notes from './componenets/Notes';
 import { Phonebook } from "./part2/phonebook/Phonebook";
+import Countries from "./part2/countries/Countries";
 // const notes = [
 //   {
 //     id: 1,
@@ -25,8 +26,9 @@ const App = () => {
  
   return (
     <>
-    <Phonebook />
-   <Notes />
+    {/* <Phonebook />
+   <Notes /> */}
+   <Countries />
     </>
   )
 };
