@@ -1,0 +1,24 @@
+### PERSONS
+
+# GET all persons
+GET http://localhost:3001/api/persons
+
+### GET person with ID 2
+GET http://localhost:3001/api/persons/2
+
+### DELETE person with ID 2
+DELETE http://localhost:3001/api/persons/2
+
+### POST PERSON 
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Rojin",
+    "number": "0737372"
+}
+
+### INFO
+
+# GET general info
+GET http://localhost:3001/info
